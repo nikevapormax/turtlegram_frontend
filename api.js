@@ -81,8 +81,41 @@ async function getName() {
     response_json = await response.json()
     console.log(response_json)
 
-    const usermail = document.getElementById('usermail')
+    const usermail = document.getElementById('useremail')
     usermail.innerText = response_json.email
 
     return response_json.email
+}
+
+async function postArticle(title, content) {
+    const articleData = {
+        title: title,
+        content: content
+    }
+    console.log(articleData)
+
+    const response = await fetch(`${backend_base_url}/article`, {
+        method: 'POST',
+        headers: {
+            'Authorization': localStorage.getItem('token')
+        },
+        body: JSON.stringify(articleData)
+    })
+
+    response_json = await response.json()
+    console.log(response_json)
+
+    if (response.status == 200) {
+        window.location.replace(`${frontend_base_url}/`)
+    }
+}
+
+async function getArticles() {
+    const response = await fetch(`${backend_base_url}/article`, {
+        method: 'GET'
+    })
+
+    response_json = await response.json()
+
+    return response_json.articles
 }
