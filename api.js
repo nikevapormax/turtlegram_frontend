@@ -34,7 +34,7 @@ async function handleSignup() { // async를 붙여주어 '비동기함수'임을
     //     signupData['password'] = signupData['password']
     // }
 
-    if (response.status == 201) { // 회원가입에 성공하게 되면 로그인 페이지로 넘어가게 됨
+    if (response.status == 200) { // 회원가입에 성공하게 되면 로그인 페이지로 넘어가게 됨
         alert('회원가입에 성공하였습니다!');
         window.location.replace(`${frontend_base_url}/login.html`);
     } else { // 회원가입에 실패하게 되면 경고문 
@@ -58,7 +58,7 @@ async function handleSignin() { // async를 붙여주어 '비동기함수'임을
 
     console.log(response)
     response_json = await response.json()
-    console.log(response_json)
+    console.log(response_json.token)
     localStorage.setItem("token", response_json.token)
 
     if (response.status == 201) {
@@ -78,13 +78,18 @@ async function getName() {
     })
     console.log(response)
 
-    response_json = await response.json()
-    console.log(response_json)
+    // response_json = await response.json()
 
-    const usermail = document.getElementById('useremail')
-    usermail.innerText = response_json.email
-
-    return response_json.email
+    if (response.status == 200) { // authorize로 인해서 통과 못하면 401이 나옴!
+        response_json = await response.json()
+        console.log(response_json)
+        return response_json.email
+    } else {
+        return null
+    }
+    // 아래 부분은 필요가 없어짐. 그래서 삭제!
+    // const usermail = document.getElementById('useremail')
+    // usermail.innerText = response_json.email
 }
 
 async function postArticle(title, content) {
@@ -118,4 +123,27 @@ async function getArticles() {
     response_json = await response.json()
 
     return response_json.articles
+}
+
+// 로그아웃 기능. 로그아웃 시 로컬 스토리지에 저장되어 있던 유저의 token 값을 삭제하고 해당 페이지에서 새로고침만 진행한다. 
+async function logout() {
+    localStorage.removeItem('token')
+    window.location.replace(`${frontend_base_url}/`)
+}
+
+async function articleDetail(article_id) {
+    console.log(article_id)
+    const url = `${frontend_base_url}/article_detail.html?id=${article_id}`
+    location.href = url
+}
+
+async function getArticleDetail(article_id) {
+    const response = await fetch(`${backend_base_url}/article/${article_id}`, {
+        method: "GET"
+    })
+
+    response_json = await response.json()
+    console.log(response_json)
+
+    return response_json.article
 }
