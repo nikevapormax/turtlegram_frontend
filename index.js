@@ -21,7 +21,7 @@ async function checkLogin() {
     const useremail = document.getElementById('useremail')
     const loginoutButton = document.getElementById('loginout')
     if (email) {
-        useremail.innerText = email
+        useremail.innerText = email.email
         loginoutButton.innerText = '로그아웃'
         loginoutButton.setAttribute('onclick', "logout()")
     } else {
