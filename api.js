@@ -83,7 +83,7 @@ async function getName() {
     if (response.status == 200) { // authorize로 인해서 통과 못하면 401이 나옴!
         response_json = await response.json()
         console.log(response_json)
-        return response_json.email
+        return response_json
     } else {
         return null
     }
@@ -146,4 +146,41 @@ async function getArticleDetail(article_id) {
     console.log(response_json)
 
     return response_json.article
+}
+
+async function patchArticle(article_id, title, content) {
+    const articleData = {
+        "title": title,
+        "content": content
+    }
+
+    const response = await fetch(`${backend_base_url}/article/${article_id}`, {
+        headers: {
+            'Authorization': localStorage.getItem('token')
+        },
+        method: 'PATCH',
+        body: JSON.stringify(articleData)
+    })
+
+
+    // 여기서 현재 로그인 하지 않은 아이디로 수정을 시도할 수 있다. 이러면 오류 뜨니까 꼭 로그인한 사용자로 하기!
+    if (response.status == 200) {
+        response_json = await response.json()
+        return response_json
+    } else {
+        alert(response.status)
+    }
+}
+
+async function deleteArticle() {
+    const response = await fetch(`${backend_base_url}/article/${article_id}`, {
+        headers: { 'Authorization': localStorage.getItem('token') },
+        method: 'DELETE'
+    })
+
+    if (response.status == 200) {
+        window.location.replace(`${frontend_base_url}/`)
+    } else {
+        alert(response.status)
+    }
 }
