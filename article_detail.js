@@ -15,6 +15,18 @@ async function loadArticles(article_id) {
     content.innerText = article.content
     email.innerText = article.user_email
     time.innerText = article.time
+    console.log(article.comments)
+
+    const comment_section = document.getElementById("comment_section")
+
+    // 코멘트를 불러오기 전에 이전에 쓴 코멘트가 남아있지 않게 해주기 위해서 조치
+    comment_section.innerHTML = ''
+
+    for (let i = 0; i < article.comments.length; i++) {
+        const new_comment = document.createElement('p')
+        new_comment.innerText = article.comments[i].content
+        comment_section.appendChild(new_comment)
+    }
 
     const user = await getName()
     if (user.id != article.user) {
@@ -84,6 +96,20 @@ async function updateArticle() {
 async function removeArticle() {
     await deleteArticle(article_id)
 }
+
+async function writeComment() {
+    const comment_content = document.getElementById('comment_content')
+    // article_id를 통해 해당 게시글에 댓글을 작성할 것임. comment_content.value는 댓글 내용임
+    // 누가 작성했는지는 token 값에 다 나와 있기 때문에 굳이 언급하지 않아도 됨
+    const comment = await postComment(article_id, comment_content.value)
+
+    // 이렇게 하면은 댓글이 아티클에 달리게 된다. 하지만 코멘트는 값을 가져와서 붙여주는 방식이기 때문에 원래 있던 값이 계속 남아있게 된다.
+    loadArticles(article_id)
+    // 댓글을 쓴 뒤에 댓글 입력창의 내용이 비게 하려면 댓글 작성이 끝난 이후에 비워줘야 한다. 
+    comment_content.value = ''
+
+}
+
 
 loadArticles(article_id)
 
