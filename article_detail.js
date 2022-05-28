@@ -1,6 +1,8 @@
 const urlParams = new URLSearchParams(window.location.search);
 const article_id = urlParams.get('id');
 console.log(article_id)
+// 처음에 좋아요가 반영되지 않은 상태를 만들어주기 위해 세팅
+let liked = false
 
 getArticleDetail(article_id);
 
@@ -28,6 +30,8 @@ async function loadArticles(article_id) {
         comment_section.appendChild(new_comment)
     }
 
+    // 좋아요 반영
+    updateLike()
     const user = await getName()
     if (user.id != article.user) {
         const update_button = document.getElementById('update_button')
@@ -108,6 +112,40 @@ async function writeComment() {
     // 댓글을 쓴 뒤에 댓글 입력창의 내용이 비게 하려면 댓글 작성이 끝난 이후에 비워줘야 한다. 
     comment_content.value = ''
 
+}
+
+// 좋아요 버튼 누르면 좋아요 반영되게 하는 함수 생성
+async function likeArticle() {
+    const like_button = document.getElementById('like_button')
+    // fa-thumbs-down 이라는 클래스가 있으면 없애주고, 없으면 만들어주는 로직
+    like_button.classList.toggle('fa-thumbs-down')
+
+    // 만약 처음에 '좋아요'가 되어 있지 않은 상태라면
+    if (!liked) {
+        const response = await postLike(article_id)
+        console.log(response, "좋아요")
+        // 좋아요 개수를 화면에 표시
+        like_button.innerText = parseInt(like_button.innerText) + 1
+        liked = true
+    } else {
+        const response = await deleteLike(article_id)
+        console.log(response, "취소")
+        // 좋아요 개수를 화면에 표시
+        like_button.innerText = parseInt(like_button.innerText) - 1
+        liked = false
+    }
+}
+
+
+async function updateLike() {
+    const response = await getLike(article_id)
+    console.log(response)
+    // liked : 제일 위에서 선언한 liked
+    // response.liked : server에서 얘기해주는 실제 liked인지 아닌지에 대한 값
+    liked = response.liked
+    if (liked) {
+        like_button.classList.toggle('fa-thumbs-down');
+    }
 }
 
 
